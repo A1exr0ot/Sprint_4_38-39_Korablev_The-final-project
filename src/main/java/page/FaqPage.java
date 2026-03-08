@@ -5,8 +5,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.Test;
 
+import java.util.Collections;
 import java.util.List;
+
+import static org.testng.AssertJUnit.*;
 
 public class FaqPage {
     private final WebDriver driver;
@@ -93,5 +97,19 @@ public class FaqPage {
                 .map(WebElement::getText)
                 .map(String::trim)
                 .toList();
+    }
+
+    @Test
+    public void testAnswersPanelLoading() {
+        openPage();
+        FaqPage faqPage = null;
+        List<WebElement> answersPanels;
+        answersPanels = Collections.unmodifiableList(faqPage.waitForAnswersPanel());
+        assertNotNull("Панели с ответами не загружены", answersPanels);
+        assertFalse("Не найдено ни одной панели с ответами", answersPanels.isEmpty());
+    }
+
+    private void openPage() {
+
     }
 }

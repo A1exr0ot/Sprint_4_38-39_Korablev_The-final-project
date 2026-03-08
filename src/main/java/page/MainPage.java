@@ -137,4 +137,8 @@ public class MainPage {
     public By getAcceptBtn() {
         return acceptBtn;
     }
+
+    public long getUrlYandex() {
+        return 0;
+    }
 }
