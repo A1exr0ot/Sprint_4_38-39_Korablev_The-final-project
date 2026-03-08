@@ -13,52 +13,43 @@ import java.util.Objects;
 import java.util.Set;
 
 public class MainPage {
-    public static String URL = "https://qa-scooter.praktikum-services.ru/";
+    public static final String URL = "https://qa-scooter.praktikum-services.ru/";
 
     private final WebDriver driver;
     private final WebDriverWait wait;
 
-    protected String urlYandex = "https://ya.ru/";
     private final By acceptBtn = By.id("rcc-confirm-button");
-    private final By answerPanel = By.xpath(".//div[@class='accordion__panel']/p");
     private final By upOrderBtn = By.xpath(".//button[contains(@class, 'Button_Middle__1CSJM') and text()='Заказать']");
     private final By downOrderBtn = By.xpath(".//button[contains(@class, 'Button_Middle') and text() = 'Заказать']");
     private final By logoSakamoto = By.xpath(".//*[@alt='Scooter']");
     private final By logoYandex = By.xpath(".//*[@alt='Yandex']");
     private final String scrollIntoViewScript = "arguments[0].scrollIntoView();";
-    private final By questionsAndAnswersBlock = By.cssSelector(".Home_FourPart__1uthg");
 
     public MainPage(WebDriver driver, WebDriverWait wait) {
         this.driver = driver;
         this.wait = wait;
     }
 
+    /**
+     * Кликает по кнопке заказа в верхней части страницы
+     */
     public void clickUpOrderButton() {
         driver.findElement(upOrderBtn).click();
     }
 
+    /**
+     * Кликает по кнопке заказа в нижней части страницы (с прокруткой)
+     */
     public void clickDownOrderButton() {
         WebElement button = driver.findElement(downOrderBtn);
         scrollDown(button);
         button.click();
     }
 
-    /* ------------------------------*/
-
-    // 1. Прокручиваем до блока «Вопросы о важном»
-    public WebElement findAnswerByQuestion(String question) {
-        WebElement element = driver.findElement(questionsAndAnswersBlock);
-        scrollDown(element);
-
-        // 2. Находим кнопку-стрелочку
-        String answerPanelByQuestionTextTemplate = ".//*[contains(@class, 'accordion__button') and normalize-space(text()) = '%s']";
-        return element.findElement(
-                By.xpath(
-                        String.format(answerPanelByQuestionTextTemplate, question)
-                )
-        );
-    }
-
+    /**
+     * Прокручивает элемент в видимую область экрана
+     * @param element элемент, к которому нужно прокрутить
+     */
     private void scrollDown(WebElement element) {
         wait.until(d -> {
             ((JavascriptExecutor) d).executeScript(scrollIntoViewScript, element);
@@ -66,70 +57,84 @@ public class MainPage {
         });
     }
 
-    /* ------------------------------*/
-
+    /**
+     * Кликает по логотипу Самоката
+     */
     public void clickLogoSakamoto() {
         driver.findElement(logoSakamoto).click();
     }
 
-    /* ------------------------------*/
-
+    /**
+     * Кликает по логотипу Яндекса
+     */
     public void clickLogoYandex() {
         driver.findElement(logoYandex).click();
     }
 
+    /**
+     * Получает URL открытой во второй вкладке страницы
+     * @return URL текущей вкладки
+     */
     public String getUrlOpenedInSecondTab() {
         wait.until(ExpectedConditions.numberOfWindowsToBe(2));
 
         Set<String> allWindows = driver.getWindowHandles();
         String currentWindow = driver.getWindowHandle();
+
         for (String window : allWindows) {
             if (!window.equals(currentWindow)) {
                 driver.switchTo().window(window);
-                // Распространённая проблема FF:
-                // при открытии вкладки url всегда about:blank.
-                // потом браузер переключется на url ссылки, но без этой строочки мы не дожидаемся переключения
+                // Ждём, пока страница загрузится (не будет about:blank)
                 wait.until(d -> !Objects.equals(driver.getCurrentUrl(), "about:blank"));
 
-                // Дальше цепочка редиректов, нас интересует конечный url
-                wait.until(d -> !Objects.requireNonNull(driver.getCurrentUrl()).contains("yandex.ru"));
-                wait.until(d -> !Objects.requireNonNull(driver.getCurrentUrl()).contains("sso"));
+                // Ждём завершения редиректов
+                wait.until(d -> {
+                    String currentUrl = driver.getCurrentUrl();
+                    return !currentUrl.contains("yandex.ru") &&
+                            !currentUrl.contains("sso");
+                });
                 break;
             }
         }
         return driver.getCurrentUrl();
     }
 
+    /**
+     * Принимает куки (кликает по кнопке согласия)
+     */
     public void acceptCookies() {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
         driver.findElement(getAcceptBtn()).click();
     }
 
+    /**
+     * Открывает главную страницу сервиса
+     */
     public void open() {
         driver.get(URL);
     }
 
+    /**
+     * Кликает по элементу с ожиданием кликабельности
+     * @param button элемент кнопки для клика
+     */
     public void clickButton(WebElement button) {
         wait.until(ExpectedConditions.elementToBeClickable(button)).click();
     }
 
-    public List<WebElement> waitForAnswersPanel() {
-        return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(getAnswerPanel()));
-    }
-
-    public By getAnswerPanel() {
-        return answerPanel;
-    }
-
-    public String getUrlYandex() {
-        return urlYandex;
-    }
-
-    public By getAcceptBtn() {
-        return acceptBtn;
-    }
-
+    /**
+     * Возвращает текущий URL страницы
+     * @return текущий URL
+     */
     public String getCurrentUrl() {
         return driver.getCurrentUrl();
+    }
+
+    /**
+     * Возвращает локатор кнопки принятия куки
+     * @return локатор кнопки согласия с куки
+     */
+    public By getAcceptBtn() {
+        return acceptBtn;
     }
 }

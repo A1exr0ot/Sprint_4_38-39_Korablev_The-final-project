@@ -1,37 +1,19 @@
 package steps;
 
-import org.openqa.selenium.WebElement;
-import page.MainPage;
-
-import java.util.List;
+import page.FaqPage;
 
 public class FaqSteps {
-    private final MainPage mainPage;
+    private final FaqPage faqPage;
 
-    public FaqSteps(MainPage mainPage) {
-        this.mainPage = mainPage;
+    public FaqSteps(FaqPage faqPage) {
+        this.faqPage = faqPage;
     }
 
-    public String getAnswer(WebElement button) {
-        // Кликаем по стрелочке
-        mainPage.clickButton(button);
+    public void clickQuestion(String questionText) {
+        faqPage.clickQuestion(questionText);
+    }
 
-        // Ждём появления всех блоков с ответом
-        List<WebElement> elements = mainPage.waitForAnswersPanel();
-
-        // answer пока еще ничего не нашли
-        WebElement answer = null;
-
-        // перебираем, пока не найдем видимый.
-        for (WebElement webElement : elements) {
-            if (webElement.isDisplayed()) {
-                answer = webElement;
-                break;
-            }
-        }
-        if (answer == null) {
-            return null;
-        }
-        return answer.getText().trim();
+    public String getAnswer(String questionText) {
+        return faqPage.getAnswer(questionText);
     }
 }
