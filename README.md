@@ -55,3 +55,8 @@
 ### Предварительные условия
 *   Установленный SDK corretto-11
 *   Установленный Maven maven-3.9.11
+
+---
+
+### Клонирование репозитория
+*   Клонируйте репозиторий: https://github.com/A1exr0ot/Sprint_4_38-39_Korablev_The-final-project.git
