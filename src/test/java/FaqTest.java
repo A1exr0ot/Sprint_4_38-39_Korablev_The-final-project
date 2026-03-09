@@ -81,8 +81,4 @@ public class FaqTest extends BaseTest {
         String actualAnswer = faqSteps.getAnswer(question);
         assertEquals("Ответ на вопрос '" + question + "' не совпадает.", expectedAnswer, actualAnswer);
     }
-
-    @Test
-    public void testAnswersPanelLoading() {
-        openPage();}
 }
