@@ -1,2 +1,0 @@
-# Sprint_4_38-39_Korablev_The-final-project
-Sprint_4_38-39_Korablev_The-final-project
